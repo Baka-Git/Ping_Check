@@ -1,94 +1,43 @@
-from modules.ping_module import *
+# from modules.ping_module import *
 import time
 
 
-# function for getting IP addresses from file
-def get_ips(path):
-    list_of_ips = []
-    try:
-        with open(path, 'r') as file:
-            file.readline()
-    except FileNotFoundError:
-        print("File not found")
-        return False
-    with open(path, 'r') as file:
-        line = file.readline()
-        if not check_ip(line):
-            return False
-        line = remove_n(line)
-        list_of_ips.append(line)
-        while True:
-            line = file.readline()
-            if line == "":
-                break
-            line = remove_n(line)
-            if not check_ip(line):
-                return False
-            list_of_ips.append(line)
-    print(list_of_ips)
-    return list_of_ips
-
-
-# help function for removing '\n'
-def remove_n(ip):
-    a = ip[len(ip) - 1:len(ip)]
-    if ip[len(ip) - 1:len(ip)] == "\n":
-        ip = ip[:len(ip) - 1]
-    return ip
-
-
-# function for checking format of IP address
-def check_ip(ip_address):
-    ip_parts = ip_address.split(".")
-
-    if len(ip_parts) != 4:
-        return False
-    for part in ip_parts:
-        try:
-            part = int(part)
-        except ValueError:
-            return False
-        if part > 255:
-            return False
-    return True
-
-
-def show(list_of_hosts):
+def show(list_of_hosts, output_file, is_machine):
     ip_size = 17  # 15 + 2
     time_size = 26  # 24 + 2
     info_size = get_max_size(list_of_hosts, 7) + 2
     rate_size = 11  # 9 + 2
-    print(" " + (ip_size + time_size + info_size * 4 + rate_size - 3) * "_" + "\n"
-          + "|" + same_size(" ", ip_size) + same_size(" ", time_size) + same_size("ICMP",
-                                                                                  3 * (info_size + 1) + rate_size)
-          + "\n"
-          + "|" + same_size("IP Address", ip_size) + same_size("Last Response", time_size)
-          + same_size("Total", info_size) + same_size("Success", info_size) + same_size("Fail", info_size)
-          + same_size("Fail Rate", rate_size) + "\n"
-          + "|" + same_size_special(ip_size) + same_size_special(time_size)
-          + same_size_special(info_size) + same_size_special(info_size) + same_size_special(info_size)
-          + same_size_special(rate_size)
-
-          )
+    if not is_machine:
+        header = " " + (ip_size + time_size + info_size * 4 + rate_size - 3) * "_" + "\n" + "|" + \
+                 same_size(" ", ip_size) + same_size(" ", time_size) + \
+                 same_size("ICMP", 3 * (info_size + 1) + rate_size) + "\n" + "|" + same_size("IP Address", ip_size) + \
+                 same_size("Last Response", time_size) + same_size("Total", info_size) + \
+                 same_size("Success", info_size) + same_size("Fail", info_size) + same_size("Fail Rate", rate_size) + \
+                 "\n" + "|" + same_size_special(ip_size) + same_size_special(time_size) + \
+                 same_size_special(info_size) + same_size_special(info_size) + same_size_special(info_size) + \
+                 same_size_special(rate_size) + "\n"
+        spoiler = "|" + same_size_special(ip_size) + same_size_special(time_size) + same_size_special(info_size) + \
+                  same_size_special(info_size) + same_size_special(info_size) + same_size_special(rate_size)
+        info = ""
     for i in range(0, len(list_of_hosts)):
         if list_of_hosts[i].last_response == 0:
             time_response = "No response"
         else:
-            time_response=time.ctime(list_of_hosts[i].last_response)
-        print("|" + same_size(list_of_hosts[i].address, ip_size)
-              + same_size(time_response, time_size)
-              + same_size(list_of_hosts[i].total_ping, info_size)
-              + same_size(list_of_hosts[i].success_ping, info_size)
-              + same_size((list_of_hosts[i].total_ping - list_of_hosts[i].success_ping), info_size)
-              + same_size(
-            str((list_of_hosts[i].total_ping - list_of_hosts[i].success_ping)*100 / list_of_hosts[i].total_ping)[:4] + " %",
-            rate_size)
-              )
-    print("|" + same_size_special(ip_size) + same_size_special(time_size)
-          + same_size_special(info_size) + same_size_special(info_size) + same_size_special(info_size)
-          + same_size_special(rate_size)
+            time_response = time.ctime(list_of_hosts[i].last_response)
+        if not is_machine:
+            info += "|" + same_size(list_of_hosts[i].address, ip_size) + \
+                same_size(time_response, time_size) + \
+                same_size(list_of_hosts[i].total_ping, info_size) + \
+                same_size(list_of_hosts[i].total_ping - list_of_hosts[i].fail_ping, info_size) + \
+                same_size(list_of_hosts[i].fail_ping, info_size) + \
+                same_size(str(list_of_hosts[i].fail_ping
+                              * 100 / list_of_hosts[i].total_ping)[:4] + " %", rate_size) + "\n"
 
-          )
+        # f.write("\n"+info)
+    if not is_machine:
+        f = open(output_file, "w")
+        f.write(header + info + spoiler)
+        f.close()
 
 
 # function for getting max length of string variation of total ping from all hosts
@@ -117,20 +66,6 @@ def same_size_special(size):
     return string_info
 
 
-#host = Host("8.8.8.8")
-#host.total_ping = 1000
-#host.success_ping = 999
-#host.last_response = time.time()
-#list_of_ip = [host]
-#host_2 = Host("192.1.120.253")
-#host_2.total_ping = 100
-#host_2.success_ping = 9
-#host.last_response = time.time()
-#list_of_ip.append(host_2)
-#list_of_ip[0].ping()
-#show(list_of_ip)
-# print(len(" ICMP                 |"))
-# print(len(" 10000 | 9999  | 0.00   |"))
-# print(len("Fail Rate"))
-
+def actual_files(list_of_hosts):
+    return True
 

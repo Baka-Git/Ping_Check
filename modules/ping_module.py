@@ -8,7 +8,7 @@ class Host:
         self.address = address
         self.last_response = 0
         self.total_ping = 0
-        self.success_ping = 0
+        self.fail_ping = 0
 
     def ping(self):
         argument = "-c"
@@ -17,6 +17,8 @@ class Host:
 
         value = subprocess.call(["ping", argument, "1", self.address])
         self.total_ping += 1
-        if value == 0:
-            self.last_response = time.time()
-            self.success_ping += 1
+        if value != 0:
+            self.fail_ping += 1
+            return False
+        self.last_response = time.time()
+        return True
