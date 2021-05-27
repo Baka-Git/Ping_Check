@@ -1,5 +1,6 @@
 import argparse
 from modules.ping_module import *
+import os
 
 
 def parse():
@@ -13,7 +14,7 @@ def parse():
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input_file",
                         help="Required parameter for setting input file. Format: '-i PATH_TO_FILE'. "
-                             "Example:'-i input.txt'")
+                             "Example:'-i input.txt'",required=True)
     parser.add_argument("-o", "--output_file",
                         help="Parameter for setting output file. If parameter is not given,"
                              " default output.txt file will be used."
@@ -21,7 +22,7 @@ def parse():
     parser.add_argument("-t", "--timer",
                         help="Parameter for setting interval of pinging devices in seconds. "
                              "If parameter is not given, default interval 5 s will be used."
-                             " Format: '-t INTERVAL'. Example:'-o 10'")
+                             " Format: '-t INTERVAL'. Example:'-o 10'", type=int)
     parser.add_argument("-m", "--machine_output",
                         help="Parameter for setting format of output file. If parameter is not given,"
                              "user friendly format will be used instead. Format: '-m'", action="store_true")
@@ -31,29 +32,19 @@ def parse():
     return args
 
 
-def check_file(path):
-    try:
-        f = open(path, "r")
-        f.readline()
-    except FileNotFoundError:
-        print("Given file " + path + " does not exists!")
-        return False
-    return True
-
-
 def check_int(integer):
     try:
-        print(integer)
-        a = int(integer)
+        #print(integer)
+        number = int(integer)
     except ValueError or TypeError:
         print("Given parameter is not integer!")
         return False
-    return a
+    return number
 
 
 def control(args):
     input_file = args.input_file
-    if input_file is None or not check_file(input_file):
+    if not os.path.isfile(input_file):
         return False
     else:
         list_of_ips = get_ips(input_file)
@@ -65,11 +56,11 @@ def control(args):
     if output_file is None:
         output_file = "output.txt"
     timer = args.timer
-    if timer is not None:
-        timer = check_int(timer)
-        if timer is False:
-            return False
-    else:
+    #if timer is not None:
+     #   timer = check_int(timer)
+      #  if timer is False:
+          #  return False
+    if timer is None:
         timer = 5
     machine_output = args.machine_output
     return [list_of_hosts, output_file, timer, machine_output]
@@ -78,17 +69,12 @@ def control(args):
 # function for getting IP addresses from file
 def get_ips(path):
     list_of_ips = []
-    try:
-        with open(path, 'r') as file:
-            file.readline()
-    except FileNotFoundError:
-        print("File not found")
-        return False
     with open(path, 'r') as file:
         line = file.readline()
         if not check_ip(line):
             return False
-        line = remove_n(line)
+
+        line = line.strip("\n")
         list_of_ips.append(line)
         while True:
             line = file.readline()
@@ -98,7 +84,6 @@ def get_ips(path):
             if not check_ip(line):
                 return False
             list_of_ips.append(line)
-    print(list_of_ips)
     return list_of_ips
 
 
@@ -117,11 +102,9 @@ def check_ip(ip_address):
     if len(ip_parts) != 4:
         return False
     for part in ip_parts:
-        try:
-            part = int(part)
-        except ValueError:
-            return False
-        if part > 255:
+        part = check_int(part)
+
+        if part is False or part > 255:
             return False
     return True
 

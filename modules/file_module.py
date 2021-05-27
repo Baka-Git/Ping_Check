@@ -1,12 +1,11 @@
-# from modules.ping_module import *
 import time
 
 
 def show(list_of_hosts, output_file, is_machine):
-    ip_size = 17  # 15 + 2
-    time_size = 26  # 24 + 2
-    info_size = get_max_size(list_of_hosts, 7) + 2
-    rate_size = 11  # 9 + 2
+    ip_size = 17  # 15 + 2, 15 - length of IP Address (with dots) + 2 whitespaces
+    time_size = 26  # 24 + 2,  24 - length of timestamp + 2 whitespaces
+    info_size = get_max_size(list_of_hosts, 7) + 2  # max length of string version of total amount of ping +2 whitespace
+    rate_size = 11  # 9 + 2, length of header "Fail Rate" + 2 whitespaces
     if not is_machine:
         header = " " + (ip_size + time_size + info_size * 4 + rate_size - 3) * "_" + "\n" + "|" + \
                  same_size(" ", ip_size) + same_size(" ", time_size) + \
@@ -66,6 +65,4 @@ def same_size_special(size):
     return string_info
 
 
-def actual_files(list_of_hosts):
-    return True
 
