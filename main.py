@@ -16,7 +16,6 @@ def main():
     while True:
         for i in range(0, len(list_of_hosts)):
             list_of_hosts[i].ping()
-        actual_files(list_of_hosts)
         show(list_of_hosts, output_file, is_machine)
         time.sleep(interval_to_sleep)
 

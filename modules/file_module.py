@@ -16,7 +16,7 @@ def show(list_of_hosts, output_file, is_machine):
                  same_size_special(info_size) + same_size_special(info_size) + same_size_special(info_size) + \
                  same_size_special(rate_size) + "\n"
         spoiler = "|" + same_size_special(ip_size) + same_size_special(time_size) + same_size_special(info_size) + \
-                  same_size_special(info_size) + same_size_special(info_size) + same_size_special(rate_size)
+                  same_size_special(info_size) + same_size_special(info_size) + same_size_special(rate_size) + "\n"
         info = ""
     for i in range(0, len(list_of_hosts)):
         if list_of_hosts[i].last_response == 0:
