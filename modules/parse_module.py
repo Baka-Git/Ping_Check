@@ -14,7 +14,7 @@ def parse():
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input_file",
                         help="Required parameter for setting input file. Format: '-i PATH_TO_FILE'. "
-                             "Example:'-i input.txt'",required=True)
+                             "Example:'-i input.txt'", required=True)
     parser.add_argument("-o", "--output_file",
                         help="Parameter for setting output file. If parameter is not given,"
                              " default output.txt file will be used."
@@ -27,14 +27,12 @@ def parse():
                         help="Parameter for setting format of output file. If parameter is not given,"
                              "user friendly format will be used instead. Format: '-m'", action="store_true")
     args = parser.parse_args()
-    # print(args)
     args = control(args)
     return args
 
 
 def check_int(integer):
     try:
-        #print(integer)
         number = int(integer)
     except ValueError or TypeError:
         print("Given parameter is not integer!")
@@ -53,29 +51,33 @@ def control(args):
         else:
             list_of_hosts = create_list_of_hosts(list_of_ips)
     output_file = args.output_file
-    if output_file is None:
-        output_file = "output.txt"
+
     timer = args.timer
-    #if timer is not None:
-     #   timer = check_int(timer)
-      #  if timer is False:
-          #  return False
     if timer is None:
         timer = 5
     machine_output = args.machine_output
+
+    if output_file is None:
+        if machine_output:
+            output_file = "output.json"
+        else:
+            output_file = "output.txt"
+    elif machine_output and output_file[len(output_file) - 5:len(output_file)] != ".json":
+        print("Wrong format of output file!\nIf machine output is used, json file must be given!")
+        return False
     return [list_of_hosts, output_file, timer, machine_output]
 
 
 # function for getting IP addresses from file
 def get_ips(path):
-    list_of_ips = []
+    set_of_ips = set()
     with open(path, 'r') as file:
         line = file.readline()
         if not check_ip(line):
             return False
 
         line = line.strip("\n")
-        list_of_ips.append(line)
+        set_of_ips.add(line)
         while True:
             line = file.readline()
             if line == "":
@@ -83,8 +85,8 @@ def get_ips(path):
             line = remove_n(line)
             if not check_ip(line):
                 return False
-            list_of_ips.append(line)
-    return list_of_ips
+            set_of_ips.add(line)
+    return set_of_ips
 
 
 # help function for removing '\n'
@@ -109,8 +111,8 @@ def check_ip(ip_address):
     return True
 
 
-def create_list_of_hosts(list_of_ips):
+def create_list_of_hosts(set_of_ips):
     list_of_hosts = []
-    for ip in list_of_ips:
+    for ip in set_of_ips:
         list_of_hosts.append(Host(ip))
     return list_of_hosts
