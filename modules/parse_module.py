@@ -43,10 +43,12 @@ def check_int(integer):
 def control(args):
     input_file = args.input_file
     if not os.path.isfile(input_file):
+        print("Input file does NOT exist!")
         return False
     else:
         list_of_ips = get_ips(input_file)
         if list_of_ips is False:
+            print("Wrong format of IP addresses in the Input file!")
             return False
         else:
             list_of_hosts = create_list_of_hosts(list_of_ips)
