@@ -37,7 +37,7 @@ python3 main.py ARGUMENTS
 This is a required argument in order to give the tool an input file of IP addresses
 ```
 Format: -i PATH_TO_FILE
-Example: -i try.txt
+Example: -i input.txt
 ```
 #### Output file
 Optional argument for giving the tool an output file. If no file is given the output file will be set to output.txt or output.json (.json if the `-m` option is set).
@@ -59,7 +59,7 @@ Example: -t 60
 ```
 ## Example
 ```
-Command: python3 main.py -i try.txt -o output.json -t 5 -m
+Command: python3 main.py -i input.txt -o output.json -t 5 -m
 Output file:
 {"8.8.4.4": {"last_response": "Fri May 28 09:27:00 2021", "total_ping": 3, "success": 3, "fail": 0, "fail_rate": 0.0}, "192.168.2.2": {"last_response": "No response", "total_ping": 3, "success": 0, "fail": 3, "fail_rate": 100.0}, "8.8.8.8": {"last_response": "Fri May 28 09:27:04 2021", "total_ping": 3, "success": 3, "fail": 0, "fail_rate": 0.0}, "192.168.88.1": {"last_response": "No response", "total_ping": 3, "success": 0, "fail": 3, "fail_rate": 100.0}}
 ```
